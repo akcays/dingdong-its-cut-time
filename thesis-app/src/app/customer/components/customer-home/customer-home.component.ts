@@ -30,7 +30,7 @@ export class CustomerHomeComponent implements OnInit, OnDestroy {
   private alive: boolean = true;
 
   ngOnInit() {
-    this.getLocationCoordinates((lat, lng) => this.getLocationFromCoordinates(lat, lng, (location) => this.debounce(this.updateCloseToYou(location))));
+    this.getLocationCoordinates((lat, lng) => this.getLocationFromCoordinates(lat, lng, (location) => this.updateCloseToYou(location)));
     this.searchLocation = this.location || this.currentLocation;
   }
 
@@ -40,7 +40,7 @@ export class CustomerHomeComponent implements OnInit, OnDestroy {
 
   onSearchLocationChange(): void {
     this.searchLocation = this.location;
-    this.debounce(this.updateCloseToYou(this.searchLocation));
+    this.updateCloseToYou(this.searchLocation);
   }
 
   getLocationCoordinates(next) {
@@ -49,7 +49,7 @@ export class CustomerHomeComponent implements OnInit, OnDestroy {
       .subscribe(res =>  {
         this.latitude = res.coords.latitude;
         this.longitude = res.coords.longitude;
-        console.log('this.latitude', this.latitude, 'this.longitude', this.longitude);
+        console.log(`this.latitude ${this.latitude}, this.longitude: ${this.longitude}`);
         next(this.latitude, this.longitude);
       });
   }
@@ -61,7 +61,7 @@ export class CustomerHomeComponent implements OnInit, OnDestroy {
         this.currentLocation = location;
         console.log('curr loc', this.currentLocation);
         next(this.currentLocation);
-      }, err => console.log(err));
+      }, err => console.error(err));
   }
 
   updateCloseToYou(location: string) {
@@ -69,23 +69,8 @@ export class CustomerHomeComponent implements OnInit, OnDestroy {
       .takeWhile(() => this.alive)
       .subscribe(
         data => this.stylistsCloseToYou = data,
-        err => console.log(err)
+        err => console.error(err)
       );
-  }
-
-  debounce(func, wait = 20, immediate = true) {
-    let timeout;
-    return function() {
-      let context = this, args = arguments;
-      let later = function() {
-        timeout = null;
-        if (!immediate) func.apply(context, args);
-      };
-      let callNow = immediate && !timeout;
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-      if (callNow) func.apply(context, args);
-    };
   }
 
 }
